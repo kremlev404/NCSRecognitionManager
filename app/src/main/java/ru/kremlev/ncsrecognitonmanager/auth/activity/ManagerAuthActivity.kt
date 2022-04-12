@@ -69,6 +69,7 @@ class ManagerAuthActivity  : AppCompatActivity() {
                             ).show()
 
                         } else {
+                            LogManager.e("", taskReset.exception)
                             Toast.makeText(
                                 this@ManagerAuthActivity,
                                 taskReset.exception?.toString(),
@@ -117,6 +118,7 @@ class ManagerAuthActivity  : AppCompatActivity() {
                     finish()
 
                 } else {
+                    LogManager.e("", taskSingUP.exception)
                     Toast.makeText(
                         this@ManagerAuthActivity,
                         taskSingUP.exception!!.toString(),
@@ -154,6 +156,7 @@ class ManagerAuthActivity  : AppCompatActivity() {
                         startActivity(safeIntent)
                         finish()
                     } else {
+                        LogManager.e("", taskLogin.exception)
                         Toast.makeText(
                             this@ManagerAuthActivity,
                             taskLogin.exception!!.toString(),
