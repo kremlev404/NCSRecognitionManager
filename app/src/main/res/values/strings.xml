@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">NCSRecognitonManager</string>
+    <string name="enter_email">ENTER EMAIL</string>
+    <string name="changes_are_being_made_wait">Changes Are Being Made, Wait</string>
+    <string name="logout_successful">LOGOUT SUCCESSFULLY</string>
+    <string name="login_successful">LOGIN SUCCESSFULLY</string>
+    <string name="sing_up_successful">SIGNUP SUCCESSFULLY</string>
+    <string name="enter_login_and_password">ENTER LOGIN AND PASSWORD</string>
+    <string name="going_to_manager_activity">GOING TO USER SAFE ACTIVITY</string>
+    <string name="error_enter_your_name">ERROR, ENTER YOUR NAME</string>
+    <string name="sing_up">SING UP</string>
+    <string name="reset_password">Reset password</string>
+    <string name="password">Password</string>
+    <string name="email">Email</string>
+
+</resources>

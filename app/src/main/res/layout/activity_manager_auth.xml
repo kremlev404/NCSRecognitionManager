@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/et_login"
+        android:layout_margin="96dp"
+        android:adjustViewBounds="true"
+        android:src="@drawable/ic_launcher_foreground"
+        tools:ignore="NotSibling">
+
+    </ImageView>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginBottom="8dp">
+
+        <RelativeLayout
+            android:id="@+id/login_et_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_above="@id/login_btn_layout">
+
+            <ImageView
+                android:id="@+id/login_et_layout_ic_login"
+                android:layout_width="26dp"
+                android:layout_height="56dp"
+                android:layout_marginStart="8dp"
+                android:src="@drawable/ic_email" />
+
+            <EditText
+                android:id="@+id/et_login"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_toEndOf="@+id/login_et_layout_ic_login"
+                android:backgroundTint="@color/ncs_200"
+                android:hint="@string/email"
+                android:inputType="textEmailAddress" />
+
+            <ImageView
+                android:id="@+id/pass_et_layout_ic_login"
+                android:layout_width="26dp"
+                android:layout_height="56dp"
+                android:layout_below="@+id/login_et_layout_ic_login"
+                android:layout_marginStart="8dp"
+                android:src="@drawable/ic_password" />
+
+            <EditText
+                android:id="@+id/et_password"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:layout_below="@id/et_login"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_toEndOf="@+id/pass_et_layout_ic_login"
+
+                android:backgroundTint="@color/ncs_200"
+                android:hint="@string/password"
+                android:inputType="textPassword">
+
+            </EditText>
+        </RelativeLayout>
+
+
+        <RelativeLayout
+            android:id="@+id/login_btn_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_above="@id/btn_forget"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp">
+
+            <Button
+                android:id="@+id/btn_auth"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:backgroundTint="@color/ncs_200"
+                android:text="SING IN"
+                android:textColor="@color/white">
+
+            </Button>
+
+            <TextView
+                android:id="@+id/btn_reg"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:layout_below="@id/btn_auth"
+                android:layout_marginBottom="8dp"
+                android:background="@drawable/background_stroke"
+                android:gravity="center"
+                android:shadowDx="1"
+                android:shadowDy="1"
+                android:shadowRadius="2"
+                android:text="@string/sing_up"
+                android:textColor="@color/white">
+
+            </TextView>
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/btn_forget"
+            android:layout_width="match_parent"
+            android:layout_height="24dp"
+            android:layout_alignParentBottom="true"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:backgroundTintMode="src_atop">
+
+            <TextView
+                android:id="@+id/forget_btn_tv"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:autoSizeTextType="uniform"
+                android:gravity="end"
+                android:text="@string/reset_password"
+                android:textAlignment="gravity"
+                android:textColor="@color/red">
+
+            </TextView>
+
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+
+</RelativeLayout>
