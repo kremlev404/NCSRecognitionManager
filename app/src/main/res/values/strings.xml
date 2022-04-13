@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">NCSRecognitonManager</string>
+    <string name="app_name">NCS Recognition Manager</string>
     <string name="enter_email">ENTER EMAIL</string>
     <string name="changes_are_being_made_wait">Changes Are Being Made, Wait</string>
     <string name="logout_successful">LOGOUT SUCCESSFULLY</string>
@@ -12,5 +12,6 @@
     <string name="reset_password">Reset password</string>
     <string name="password">Password</string>
     <string name="email">Email</string>
+    <string name="ncs_face_descriptor">NCS Face Descriptor</string>
 
 </resources>

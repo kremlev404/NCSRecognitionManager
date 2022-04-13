@@ -6,13 +6,61 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/tv_welcome_back"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="ManagerActivity"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:text="Welecome back: "
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+         />
+    <TextView
+        android:id="@+id/tv_manager_login"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="manager_id"
+        app:layout_constraintStart_toEndOf="@id/tv_welcome_back"
+        app:layout_constraintTop_toTopOf="@id/tv_welcome_back" />
+    <TextView
+        android:id="@+id/tv_title_of_recycler"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:textSize="18sp"
+        android:text="Available Recognition System's: "
+        app:layout_constraintTop_toBottomOf="@id/tv_welcome_back"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        tools:layout_editor_absoluteY="327dp" />
+        />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_raspberry_list_manager"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="4dp"
+        android:background="@color/alpha_100"
+        app:layout_constraintBottom_toTopOf="@id/horizontal_progressbar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_title_of_recycler"
+        />
+
+    <com.github.ybq.android.spinkit.SpinKitView
+        android:id="@+id/horizontal_progressbar"
+        style="@style/SpinKitView.Large.Wave"
+        android:layout_width="wrap_content"
+        android:layout_height="42dp"
+        android:visibility="visible"
+        android:layout_gravity="center"
+        app:SpinKit_Color="@color/red"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="@id/recycler_raspberry_list_manager"
+        app:layout_constraintEnd_toEndOf="@id/recycler_raspberry_list_manager"/>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

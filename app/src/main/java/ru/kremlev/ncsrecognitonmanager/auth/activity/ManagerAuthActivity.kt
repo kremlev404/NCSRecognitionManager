@@ -15,7 +15,7 @@ import ru.kremlev.ncsrecognitonmanager.manager.acitivity.ManagerActivity
 import ru.kremlev.ncsrecognitonmanager.utils.LogManager
 
 
-class ManagerAuthActivity  : AppCompatActivity() {
+class ManagerAuthActivity : AppCompatActivity() {
     private lateinit var binding: ActivityManagerAuthBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -31,12 +31,15 @@ class ManagerAuthActivity  : AppCompatActivity() {
     private fun buttonClicks() {
         binding.apply {
             btnReg.setOnClickListener {
-               singUpUser()
+                LogManager.d("btn reg pressed")
+                singUpUser()
             }
             btnAuth.setOnClickListener {
-               loginUser()
+                LogManager.d("btn auth pressed")
+                loginUser()
             }
             btnForget.setOnClickListener {
+                LogManager.d("btn forget pressed")
                 resetPass()
             }
         }
@@ -101,31 +104,37 @@ class ManagerAuthActivity  : AppCompatActivity() {
         val password: String = binding.etPassword.text.toString()
 
         if (email.isNotEmpty() && password.isNotEmpty()) {
-            FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, password).addOnCompleteListener { taskSingUP ->
-                if (taskSingUP.isSuccessful) {
-                    val firebaseUser = taskSingUP.result!!.user!!
+            FirebaseAuth
+                .getInstance()
+                .createUserWithEmailAndPassword(email, password)
+                .addOnCompleteListener { taskSingUP ->
+                    if (taskSingUP.isSuccessful) {
+                        val firebaseUser = taskSingUP.result!!.user!!
 
-                    Toast.makeText(
-                        this@ManagerAuthActivity,
-                        getString(R.string.sing_up_successful),
-                        Toast.LENGTH_SHORT
-                    ).show()
+                        Toast.makeText(
+                            this@ManagerAuthActivity,
+                            getString(R.string.sing_up_successful),
+                            Toast.LENGTH_SHORT
+                        ).show()
 
-                    val safeIntent = Intent(this@ManagerAuthActivity, ManagerActivity::class.java)
-                    safeIntent.flags = (Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-                    safeIntent.putExtra("user_id", firebaseUser.uid)
-                    startActivity(safeIntent)
-                    finish()
+                        val safeIntent = Intent(this@ManagerAuthActivity, ManagerActivity::class.java)
+                        safeIntent.flags = (Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                        safeIntent.putExtra("user_id", firebaseUser.uid)
+                        startActivity(safeIntent)
+                        finish()
 
-                } else {
-                    LogManager.e("", taskSingUP.exception)
-                    Toast.makeText(
-                        this@ManagerAuthActivity,
-                        taskSingUP.exception!!.toString(),
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    } else {
+                        LogManager.e("", taskSingUP.exception)
+                        Toast.makeText(
+                            this@ManagerAuthActivity,
+                            taskSingUP.exception!!.toString(),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
                 }
-            }
+                .addOnFailureListener {
+                    LogManager.e("", it)
+                }
         } else {
             Toast.makeText(
                 this@ManagerAuthActivity,
@@ -163,6 +172,9 @@ class ManagerAuthActivity  : AppCompatActivity() {
                             Toast.LENGTH_SHORT
                         ).show()
                     }
+                }
+                .addOnFailureListener {
+                    LogManager.e("", it)
                 }
         } else {
             Toast.makeText(

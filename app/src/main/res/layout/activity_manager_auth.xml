@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -10,10 +11,10 @@
         android:layout_above="@id/et_login"
         android:layout_margin="96dp"
         android:adjustViewBounds="true"
-        android:src="@drawable/ic_launcher_foreground"
-        tools:ignore="NotSibling">
-
-    </ImageView>
+        android:contentDescription="@string/ncs_face_descriptor"
+        android:src="@drawable/ic_ncs_face_descriptor"
+        app:tint="@color/white"
+        tools:ignore="NotSibling" />
 
     <RelativeLayout
         android:layout_width="match_parent"

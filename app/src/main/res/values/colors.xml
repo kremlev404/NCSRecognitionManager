@@ -6,6 +6,7 @@
     <color name="blue">#005eeb</color>
     <color name="purpule">#eb00d3</color>
     <color name="yellow">#d3eb00</color>
+    <color name="alpha_100">#00000000</color>
 
     <!--Default android colors -->
     <color name="purple_200">#FFBB86FC</color>
