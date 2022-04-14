@@ -5,6 +5,7 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+
 import ru.kremlev.ncsrecognitonmanager.R
 import ru.kremlev.ncsrecognitonmanager.databinding.ItemManagerRecyclerBinding
 

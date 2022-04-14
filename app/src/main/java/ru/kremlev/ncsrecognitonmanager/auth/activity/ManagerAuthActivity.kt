@@ -51,9 +51,9 @@ class ManagerAuthActivity : AppCompatActivity() {
         val builder = AlertDialog
             .Builder(this)
             .setView(dialogBinding?.root)
-        val mAlertDialog = builder.show()
+        val alertDialog = builder.show()
 
-        mAlertDialog.setOnDismissListener {
+        alertDialog.setOnDismissListener {
             dialogBinding = null
         }
 
@@ -81,7 +81,7 @@ class ManagerAuthActivity : AppCompatActivity() {
                         }
                     }
 
-                    mAlertDialog.dismiss()
+                    alertDialog.dismiss()
                 } else {
                     Toast.makeText(
                         this@ManagerAuthActivity,
@@ -94,7 +94,7 @@ class ManagerAuthActivity : AppCompatActivity() {
             //btn -
             dialogResetPasswordBtnCancel.setOnClickListener {
                 LogManager.d("Cancel button was clicked")
-                mAlertDialog.dismiss()
+                alertDialog.dismiss()
             }
         }
     }
@@ -117,10 +117,10 @@ class ManagerAuthActivity : AppCompatActivity() {
                             Toast.LENGTH_SHORT
                         ).show()
 
-                        val safeIntent = Intent(this@ManagerAuthActivity, ManagerActivity::class.java)
-                        safeIntent.flags = (Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-                        safeIntent.putExtra("user_id", firebaseUser.uid)
-                        startActivity(safeIntent)
+                        val managerIntent = Intent(this@ManagerAuthActivity, ManagerActivity::class.java)
+                        managerIntent.flags = (Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                        managerIntent.putExtra("user_id", firebaseUser.uid)
+                        startActivity(managerIntent)
                         finish()
 
                     } else {
@@ -149,7 +149,9 @@ class ManagerAuthActivity : AppCompatActivity() {
         val password: String = binding.etPassword.text.toString()
 
         if (email.isNotEmpty() && password.isNotEmpty()) {
-            FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password)
+            FirebaseAuth
+                .getInstance()
+                .signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener { taskLogin ->
                     if (taskLogin.isSuccessful) {
                         Toast.makeText(
@@ -157,12 +159,12 @@ class ManagerAuthActivity : AppCompatActivity() {
                             getString(R.string.login_successful),
                             Toast.LENGTH_SHORT
                         ).show()
-                        val safeIntent =
+                        val managerIntent =
                             Intent(this@ManagerAuthActivity, ManagerActivity::class.java)
-                        safeIntent.flags =
+                        managerIntent.flags =
                             (Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-                        safeIntent.putExtra("user_id", FirebaseAuth.getInstance().currentUser!!.uid)
-                        startActivity(safeIntent)
+                        managerIntent.putExtra("user_id", FirebaseAuth.getInstance().currentUser!!.uid)
+                        startActivity(managerIntent)
                         finish()
                     } else {
                         LogManager.e("", taskLogin.exception)
