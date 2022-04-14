@@ -4,15 +4,30 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 
 import ru.kremlev.ncsrecognitonmanager.R
 import ru.kremlev.ncsrecognitonmanager.databinding.ItemManagerRecyclerBinding
+import ru.kremlev.ncsrecognitonmanager.manager.data.RecognitionSystemData
+import ru.kremlev.ncsrecognitonmanager.manager.data.RecognitionSystemType
+import ru.kremlev.ncsrecognitonmanager.manager.viewmodels.Navigation
 
 
 class RecyclerViewManagerAdapter(
-    val context: Context
+    private val context: Context
 ) : RecyclerView.Adapter<RecyclerViewManagerAdapter.ViewManagerHolder>() {
+    private var itemList = mutableListOf<RecognitionSystemData>()
+    private var selectedItem: Int = -1
+
+    fun setData(newList: ArrayList<RecognitionSystemData>) {
+        val utils = ListDiffUtils(itemList, newList)
+        val diffResult = DiffUtil.calculateDiff(utils)
+
+        diffResult.dispatchUpdatesTo(this)
+
+        itemList = newList
+    }
 
     class ViewManagerHolder(
         val binding: ItemManagerRecyclerBinding
@@ -27,12 +42,30 @@ class RecyclerViewManagerAdapter(
         return ViewManagerHolder(binding)
     }
 
-    @SuppressLint("SetTextI18n")
-    override fun onBindViewHolder(holder: ViewManagerHolder, position: Int) {
-        holder.binding.tvRaspId.text = "raspId $position"
+    @SuppressLint("SetTextI18n", "UseCompatLoadingForDrawables", "NotifyDataSetChanged")
+    override fun onBindViewHolder(holder: ViewManagerHolder, @SuppressLint("RecyclerView") position: Int) {
+        val current = itemList[position]
+        if (position == selectedItem) {
+            holder.binding.tvItemId.alpha = 1f
+        } else {
+            holder.binding.tvItemId.alpha = 0.5f
+        }
+        holder.itemView.setOnClickListener {
+            selectedItem = position
+            Navigation.selectedSystem.value = position
+            notifyDataSetChanged()
+        }
+        holder.binding.tvItemId.text = current.id
+        holder.binding.ivIconItem.setImageDrawable(
+            when (current.type) {
+                RecognitionSystemType.RASPBERRY -> context.getDrawable(R.drawable.ic_raspberrypi)
+                RecognitionSystemType.X86 -> context.getDrawable(R.drawable.ic_settings)
+                else -> context.getDrawable(R.drawable.ic_settings)
+            }
+        )
     }
 
     override fun getItemCount(): Int {
-        return 35
+        return itemList.size
     }
 }

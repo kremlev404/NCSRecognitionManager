@@ -4,11 +4,23 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="Graph will be here"
-        >
+    <TextView
+        android:id="@+id/tv_choosen"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:text="Chosen System: "
+        android:textSize="18sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-    </Button>
+    <TextView
+        android:id="@+id/tv_id"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="system_id"
+        android:textSize="18sp"
+        app:layout_constraintStart_toEndOf="@id/tv_choosen"
+        app:layout_constraintTop_toTopOf="@id/tv_choosen" />
 </androidx.constraintlayout.widget.ConstraintLayout>
