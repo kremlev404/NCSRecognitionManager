@@ -47,8 +47,8 @@ class ManagerActivity : AppCompatActivity() {
         }
 
         model.currentUser.observe(this) {
-            LogManager.d("User logged out $it ")
             if (it == "null") {
+                LogManager.d("User logged out $it ")
                 val managerIntent = Intent(this@ManagerActivity, ManagerAuthActivity::class.java)
                 managerIntent.flags = (Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
                 startActivity(managerIntent)

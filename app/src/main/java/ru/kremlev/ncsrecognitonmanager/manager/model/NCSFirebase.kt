@@ -6,6 +6,9 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 import ru.kremlev.ncsrecognitonmanager.manager.data.PersonData
 import ru.kremlev.ncsrecognitonmanager.manager.data.RecognitionSystemData
@@ -33,23 +36,31 @@ object NCSFirebase {
         database
             .addChildEventListener(object : ChildEventListener {
                 override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
-                    treeDive(snapshot)
-                    updateData()
+                    CoroutineScope(Dispatchers.Default).launch {
+                        treeDive(snapshot)
+                        updateData()
+                    }
                 }
 
                 override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
-                    treeDive(snapshot)
-                    updateData()
+                    CoroutineScope(Dispatchers.Default).launch {
+                        treeDive(snapshot)
+                        updateData()
+                    }
                 }
 
                 override fun onChildRemoved(snapshot: DataSnapshot) {
-                    treeDive(snapshot)
-                    updateData()
+                    CoroutineScope(Dispatchers.Default).launch {
+                        treeDive(snapshot)
+                        updateData()
+                    }
                 }
 
                 override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {
-                    treeDive(snapshot)
-                    updateData()
+                    CoroutineScope(Dispatchers.Default).launch {
+                        treeDive(snapshot)
+                        updateData()
+                    }
                 }
 
                 override fun onCancelled(error: DatabaseError) {
@@ -59,7 +70,7 @@ object NCSFirebase {
     }
 
     private fun updateData() {
-        systemList.value = systemIdLocalList
+        systemList.postValue(systemIdLocalList)
         systemIdLocalList = arrayListOf()
     }
 
@@ -83,13 +94,12 @@ object NCSFirebase {
                     probs = listProb
                 } else if (it.key?.contains("timestamp") == true) {
                     val listProb = it.value as ArrayList<String>
-                    i++
-                    ts.add(TimeStamp(i))
+                    listProb.forEach { lp ->
+                        ts.add(TimeStamp(lp.substringAfterLast(";").filter { it != '.' }.toInt()))
+                    }
                 }
             }
-            probs.forEach {
-                ts.add(TimeStamp(i))
-            }
+
             personsList.add(PersonData(personID, probs, ts))
             ts = arrayListOf()
             probs = arrayListOf()
@@ -107,7 +117,7 @@ object NCSFirebase {
         }
     }
 
-    fun treeDive(dataSnapshot: DataSnapshot) {
+    private fun treeDive(dataSnapshot: DataSnapshot) {
         if (dataSnapshot.hasChildren()) {
             val key = dataSnapshot.key.toString()
 
