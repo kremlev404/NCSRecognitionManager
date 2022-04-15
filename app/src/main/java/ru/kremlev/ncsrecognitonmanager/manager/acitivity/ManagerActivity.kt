@@ -2,8 +2,10 @@ package ru.kremlev.ncsrecognitonmanager.manager.acitivity
 
 import android.content.Intent
 import android.os.Bundle
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.get
+import androidx.fragment.app.activityViewModels
 
 import com.google.android.material.tabs.TabLayoutMediator
 import com.google.firebase.auth.FirebaseAuth
@@ -13,10 +15,13 @@ import ru.kremlev.ncsrecognitonmanager.databinding.ActivityManagerBinding
 import ru.kremlev.ncsrecognitonmanager.manager.AdapterTabPager
 import ru.kremlev.ncsrecognitonmanager.manager.fragments.ManagerFragment
 import ru.kremlev.ncsrecognitonmanager.manager.fragments.StatisticFragment
+import ru.kremlev.ncsrecognitonmanager.manager.model.NCSFirebase
+import ru.kremlev.ncsrecognitonmanager.manager.viewmodels.RecognitionSystemViewModel
 import ru.kremlev.ncsrecognitonmanager.utils.LogManager
 
 class ManagerActivity : AppCompatActivity() {
     private lateinit var binding: ActivityManagerBinding
+    private val model: RecognitionSystemViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,15 +45,18 @@ class ManagerActivity : AppCompatActivity() {
             FirebaseAuth.getInstance().signOut()
             true
         }
-        FirebaseAuth.getInstance().addAuthStateListener {
-            if (it.currentUser == null) {
-                LogManager.d("User logged out")
+
+        model.currentUser.observe(this) {
+            LogManager.d("User logged out $it ")
+            if (it == "null") {
                 val managerIntent = Intent(this@ManagerActivity, ManagerAuthActivity::class.java)
                 managerIntent.flags = (Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
                 startActivity(managerIntent)
                 finish()
             }
         }
+
+        NCSFirebase.init()
 
         LogManager.d()
     }

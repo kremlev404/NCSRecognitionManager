@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 
@@ -11,7 +12,7 @@ import ru.kremlev.ncsrecognitonmanager.R
 import ru.kremlev.ncsrecognitonmanager.databinding.ItemManagerRecyclerBinding
 import ru.kremlev.ncsrecognitonmanager.manager.data.RecognitionSystemData
 import ru.kremlev.ncsrecognitonmanager.manager.data.RecognitionSystemType
-import ru.kremlev.ncsrecognitonmanager.manager.viewmodels.Navigation
+import ru.kremlev.ncsrecognitonmanager.manager.model.Navigation
 
 
 class RecyclerViewManagerAdapter(
@@ -36,7 +37,7 @@ class RecyclerViewManagerAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewManagerHolder {
         val binding = ItemManagerRecyclerBinding.inflate(LayoutInflater.from(parent.context))
-        binding.itemManagerRecycler.setCardBackgroundColor(context.resources.getColor(R.color.alpha_100))
+        binding.itemManagerRecycler.setCardBackgroundColor(ContextCompat.getColor(context, R.color.alpha_100))
         binding.itemManagerRecycler.cardElevation = 0.0f
 
         return ViewManagerHolder(binding)
@@ -60,7 +61,6 @@ class RecyclerViewManagerAdapter(
             when (current.type) {
                 RecognitionSystemType.RASPBERRY -> context.getDrawable(R.drawable.ic_raspberrypi)
                 RecognitionSystemType.X86 -> context.getDrawable(R.drawable.ic_settings)
-                else -> context.getDrawable(R.drawable.ic_settings)
             }
         )
     }

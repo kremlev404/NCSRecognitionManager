@@ -1,4 +1,4 @@
-package ru.kremlev.ncsrecognitonmanager.manager.viewmodels
+package ru.kremlev.ncsrecognitonmanager.manager.model
 
 import androidx.lifecycle.MutableLiveData
 

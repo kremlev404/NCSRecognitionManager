@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "311133578336",
+    "firebase_url": "https://ncsrecognition-default-rtdb.europe-west1.firebasedatabase.app",
     "project_id": "ncsrecognition",
     "storage_bucket": "ncsrecognition.appspot.com"
   },
