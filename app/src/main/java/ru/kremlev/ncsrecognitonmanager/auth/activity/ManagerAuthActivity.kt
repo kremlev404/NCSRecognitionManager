@@ -127,7 +127,7 @@ class ManagerAuthActivity : AppCompatActivity() {
                         LogManager.e("", taskSingUP.exception)
                         Toast.makeText(
                             this@ManagerAuthActivity,
-                            taskSingUP.exception!!.toString(),
+                            taskSingUP.exception?.toString(),
                             Toast.LENGTH_SHORT
                         ).show()
                     }
@@ -170,7 +170,7 @@ class ManagerAuthActivity : AppCompatActivity() {
                         LogManager.e("", taskLogin.exception)
                         Toast.makeText(
                             this@ManagerAuthActivity,
-                            taskLogin.exception!!.toString(),
+                            taskLogin.exception?.toString(),
                             Toast.LENGTH_SHORT
                         ).show()
                     }

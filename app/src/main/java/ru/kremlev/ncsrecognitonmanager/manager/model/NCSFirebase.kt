@@ -113,7 +113,7 @@ object NCSFirebase {
         return when (type) {
             "raspberry" -> RecognitionSystemType.RASPBERRY
             "x86" -> RecognitionSystemType.X86
-            else -> RecognitionSystemType.RASPBERRY
+            else -> RecognitionSystemType.X86
         }
     }
 

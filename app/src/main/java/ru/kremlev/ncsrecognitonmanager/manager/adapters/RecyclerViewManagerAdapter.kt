@@ -60,7 +60,7 @@ class RecyclerViewManagerAdapter(
         holder.binding.ivIconItem.setImageDrawable(
             when (current.type) {
                 RecognitionSystemType.RASPBERRY -> context.getDrawable(R.drawable.ic_raspberrypi)
-                RecognitionSystemType.X86 -> context.getDrawable(R.drawable.ic_settings)
+                RecognitionSystemType.X86 -> context.getDrawable(R.drawable.ic_x86)
             }
         )
     }

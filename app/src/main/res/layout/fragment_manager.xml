@@ -34,7 +34,7 @@
         />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recycler_raspberry_list_manager"
+        android:id="@+id/recycler_systemsId_list_manager"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginStart="16dp"
@@ -60,7 +60,7 @@
         android:layout_centerHorizontal="true"
         android:layout_alignParentBottom="true"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="@id/recycler_raspberry_list_manager"
-        app:layout_constraintEnd_toEndOf="@id/recycler_raspberry_list_manager"/>
+        app:layout_constraintStart_toStartOf="@id/recycler_systemsId_list_manager"
+        app:layout_constraintEnd_toEndOf="@id/recycler_systemsId_list_manager"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

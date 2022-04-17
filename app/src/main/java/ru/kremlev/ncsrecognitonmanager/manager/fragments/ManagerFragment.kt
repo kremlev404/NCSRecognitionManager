@@ -43,15 +43,15 @@ class ManagerFragment : Fragment() {
         layoutManager = LinearLayoutManager(requireContext())
 
         binding.apply {
-            recyclerRaspberryListManager.layoutManager = layoutManager
+            recyclerSystemsIdListManager.layoutManager = layoutManager
 
-            recyclerRaspberryListManager.adapter = adapter
+            recyclerSystemsIdListManager.adapter = adapter
 
             val dividerItemDecoration = DividerItemDecoration(
-                recyclerRaspberryListManager.context,
+                recyclerSystemsIdListManager.context,
                 RecyclerView.VERTICAL
             )
-            recyclerRaspberryListManager.addItemDecoration(dividerItemDecoration)
+            recyclerSystemsIdListManager.addItemDecoration(dividerItemDecoration)
         }
 
         model.recognitionSystemData.observe(viewLifecycleOwner, Observer<ArrayList<RecognitionSystemData>> { list ->
@@ -70,7 +70,6 @@ class ManagerFragment : Fragment() {
             list.log()
             adapter.setData(list)
             Navigation.selectedSystem.value = -1
-
         }
 
         return view
