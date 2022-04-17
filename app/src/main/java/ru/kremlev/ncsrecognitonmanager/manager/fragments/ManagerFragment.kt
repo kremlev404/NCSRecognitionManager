@@ -10,7 +10,9 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+
 import com.google.firebase.auth.FirebaseAuth
+
 import ru.kremlev.ncsrecognitonmanager.databinding.FragmentManagerBinding
 import ru.kremlev.ncsrecognitonmanager.manager.adapters.RecyclerViewManagerAdapter
 import ru.kremlev.ncsrecognitonmanager.manager.data.RecognitionSystemData
@@ -60,7 +62,7 @@ class ManagerFragment : Fragment() {
         })
 
         model.systemList.observe(viewLifecycleOwner) { list ->
-            if(list.isEmpty())
+            if (list.isEmpty())
                 binding.horizontalProgressbar.visibility = View.VISIBLE
             else
                 binding.horizontalProgressbar.visibility = View.INVISIBLE

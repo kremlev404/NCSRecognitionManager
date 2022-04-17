@@ -1,6 +1,6 @@
 package ru.kremlev.ncsrecognitonmanager.manager.fragments
 
-import android.R
+import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -9,14 +9,19 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.github.mikephil.charting.components.Description
 import com.github.mikephil.charting.components.XAxis
+import com.github.mikephil.charting.components.YAxis
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
+import com.github.mikephil.charting.formatter.ValueFormatter
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
+import com.github.mikephil.charting.utils.ColorTemplate
+import java.text.SimpleDateFormat
+import java.util.*
 import ru.kremlev.ncsrecognitonmanager.databinding.FragmentStatisticBinding
+import ru.kremlev.ncsrecognitonmanager.manager.data.RecognitionSystemData
 import ru.kremlev.ncsrecognitonmanager.manager.viewmodels.RecognitionSystemViewModel
 import ru.kremlev.ncsrecognitonmanager.utils.LogManager
-
 
 class StatisticFragment : Fragment() {
     private var _binding: FragmentStatisticBinding? = null
@@ -29,49 +34,83 @@ class StatisticFragment : Fragment() {
         _binding = FragmentStatisticBinding.inflate(inflater, container, false)
         val view = binding.root
 
-        val graphColorList = arrayOf(
-            requireContext().getColor(R.color.holo_red_dark),
-            requireContext().getColor(R.color.holo_orange_dark),
-            requireContext().getColor(R.color.holo_green_light),
-            requireContext().getColor(R.color.holo_purple),
-            requireContext().getColor(R.color.holo_orange_light),
-            requireContext().getColor(R.color.black),
-        )
+        setupGraph()
+
         model.getSelectedSystem().observe(viewLifecycleOwner) { it ->
             LogManager.d()
-
             binding.tvId.text =
                 if (it > -1) {
-                    val currentSystem = model.systemList.value?.get(it)
-                    val data = arrayListOf<Entry>()
-                    val lineDataSet: ArrayList<ILineDataSet> = arrayListOf()
-                    if (currentSystem?.personData?.isNotEmpty() == true) {
-                        currentSystem.personData.forEachIndexed { presonInd, personData ->
-                            personData.probs.forEachIndexed { ind, prob ->
-                                data.add(Entry(personData.timestamps[ind].ms.toFloat(), prob))
-                            }
-                            val iLine = LineDataSet(data, personData.personID)
-                            iLine.setColor(graphColorList[presonInd])
-                            iLine.setCircleColor(graphColorList[presonInd])
-                            lineDataSet.add(iLine)
-                        }
-
-                        val ld: LineData = LineData(lineDataSet)
-                        binding.graph.data = ld
-
-                        binding.graph.xAxis.position = XAxis.XAxisPosition.BOTTOM
-                        val description = Description()
-                        description.isEnabled = false
-                        binding.graph.description = description
-                        binding.graph.notifyDataSetChanged()
-
-                    }
-                    (currentSystem?.id ?: "No selected").toString()
+                    (updateGraph(it)?.id ?: "No selected").toString()
                 } else
                     "Please Select System At Manager Page"
         }
 
         return view
+    }
+
+    private fun setupGraph() {
+        binding.graph.xAxis.position = XAxis.XAxisPosition.BOTTOM
+
+        val xAxis: XAxis = binding.graph.xAxis
+        xAxis.textColor = Color.WHITE
+        xAxis.granularity = .25f
+        xAxis.valueFormatter = object : ValueFormatter() {
+            private val mFormat: SimpleDateFormat = SimpleDateFormat("dd MMM HH:mm", Locale.ENGLISH)
+            override fun getFormattedValue(value: Float): String {
+                return mFormat.format(Date(value.toLong()))
+            }
+        }
+
+        val yAxis: YAxis = binding.graph.axisLeft
+        yAxis.textColor = Color.WHITE
+
+        val rightAxis: YAxis = binding.graph.axisRight
+        rightAxis.isEnabled = false
+
+        val description = Description()
+        description.isEnabled = false
+        binding.graph.description = description
+
+        // enable touch gestures
+        binding.graph.setTouchEnabled(true)
+
+        // enable scaling and dragging
+        binding.graph.isDragEnabled = true
+        binding.graph.setScaleEnabled(true)
+    }
+
+    private val colors = intArrayOf(
+        ColorTemplate.VORDIPLOM_COLORS[0],
+        ColorTemplate.VORDIPLOM_COLORS[1],
+        ColorTemplate.VORDIPLOM_COLORS[2]
+    )
+
+    private fun updateGraph(index: Int): RecognitionSystemData? {
+        val currentSystem = model.systemList.value?.get(index)
+
+        val dataSets = ArrayList<ILineDataSet>()
+
+        if (currentSystem?.personData?.isNotEmpty() == true) {
+            currentSystem.personData.forEachIndexed { personInd, personData ->
+                val values = ArrayList<Entry>()
+
+                personData.probs.forEachIndexed { ind, prob ->
+                    values.add(Entry(personData.timestamps[ind].ms.toFloat(), prob))
+                }
+
+                val lineDataSet = LineDataSet(values, personData.personID)
+
+                lineDataSet.color = colors[personInd % colors.size]
+                lineDataSet.valueTextColor = colors[personInd % colors.size]
+                lineDataSet.setCircleColor(colors[personInd % colors.size])
+                dataSets.add(lineDataSet)
+            }
+
+            val data = LineData(dataSets)
+            binding.graph.data = data
+            binding.graph.invalidate()
+        }
+        return currentSystem
     }
 
     override fun onDestroyView() {

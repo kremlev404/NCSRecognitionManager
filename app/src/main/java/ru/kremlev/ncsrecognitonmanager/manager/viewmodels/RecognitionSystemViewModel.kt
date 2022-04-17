@@ -3,6 +3,7 @@ package ru.kremlev.ncsrecognitonmanager.manager.viewmodels
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+
 import ru.kremlev.ncsrecognitonmanager.manager.data.RecognitionSystemData
 import ru.kremlev.ncsrecognitonmanager.manager.model.NCSFirebase
 import ru.kremlev.ncsrecognitonmanager.manager.model.Navigation
@@ -27,5 +28,4 @@ class RecognitionSystemViewModel : ViewModel() {
     fun getSelectedSystem(): LiveData<Int> {
         return selectedSystem
     }
-
 }

@@ -93,9 +93,9 @@ object NCSFirebase {
                     val listProb = it.value as ArrayList<Float>
                     probs = listProb
                 } else if (it.key?.contains("timestamp") == true) {
-                    val listProb = it.value as ArrayList<String>
+                    val listProb = it.value as ArrayList<Long>
                     listProb.forEach { lp ->
-                        ts.add(TimeStamp(lp.substringAfterLast(";").filter { it != '.' }.toInt()))
+                        ts.add(TimeStamp(lp * 1000))
                     }
                 }
             }
