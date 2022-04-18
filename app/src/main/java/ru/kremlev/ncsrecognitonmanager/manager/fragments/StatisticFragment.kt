@@ -20,9 +20,16 @@ import com.github.mikephil.charting.highlight.Highlight
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener
 import com.github.mikephil.charting.utils.ColorTemplate
+import java.lang.Exception
 
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 
 import ru.kremlev.ncsrecognitonmanager.databinding.FragmentStatisticBinding
 import ru.kremlev.ncsrecognitonmanager.manager.data.RecognitionSystemData
@@ -34,6 +41,8 @@ class StatisticFragment : Fragment(), OnChartValueSelectedListener {
     private val binding: FragmentStatisticBinding
         get() = _binding!!
 
+    private val mutex = Mutex()
+
     private val model: RecognitionSystemViewModel by activityViewModels()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -43,12 +52,25 @@ class StatisticFragment : Fragment(), OnChartValueSelectedListener {
         setupGraph()
 
         model.getSelectedSystem().observe(viewLifecycleOwner) { it ->
-            LogManager.d()
-            binding.tvId.text =
-                if (it > -1) {
+            CoroutineScope(Dispatchers.Default).launch {
+                LogManager.d()
+                val selectedSystem = if (it > -1) {
                     (updateGraph(it)?.id ?: "No selected").toString()
                 } else
                     "Please Select System At Manager Page"
+                withContext(Dispatchers.Main) {
+                    binding.tvId.text = selectedSystem
+                }
+            }
+        }
+
+        model.systemList.observe(viewLifecycleOwner) {
+            model.getSelectedSystem().value?.let { selected ->
+                CoroutineScope(Dispatchers.Default).launch {
+                    if (selected > -1)
+                        updateGraph(selected)
+                }
+            }
         }
 
         return view
@@ -56,7 +78,7 @@ class StatisticFragment : Fragment(), OnChartValueSelectedListener {
 
     @SuppressLint("SetTextI18n")
     override fun onValueSelected(e: Entry?, h: Highlight?) {
-        val format: SimpleDateFormat = SimpleDateFormat("dd/MMM/yyyy hh:mm:ss", Locale.ENGLISH)
+        val format: SimpleDateFormat = SimpleDateFormat("dd/MMM/yyyy hh:mm:ss::ms", Locale.ENGLISH)
         binding.tvSelectedItem.text = "Chosen Point: (${e?.y} : ${format.format(Date(e?.x?.toLong() ?: 0L))})"
     }
 
@@ -74,7 +96,7 @@ class StatisticFragment : Fragment(), OnChartValueSelectedListener {
         xAxis.textColor = Color.WHITE
         xAxis.granularity = .25f
         xAxis.valueFormatter = object : ValueFormatter() {
-            private val mFormat: SimpleDateFormat = SimpleDateFormat("mm:ss", Locale.ENGLISH)
+            private val mFormat: SimpleDateFormat = SimpleDateFormat("hh::mm:ss", Locale.ENGLISH)
             override fun getFormattedValue(value: Float): String {
                 return mFormat.format(Date(value.toLong()))
             }
@@ -104,32 +126,43 @@ class StatisticFragment : Fragment(), OnChartValueSelectedListener {
         ColorTemplate.VORDIPLOM_COLORS[2]
     )
 
-    private fun updateGraph(index: Int): RecognitionSystemData? {
-        val currentSystem = model.systemList.value?.get(index)
+    private suspend fun updateGraph(index: Int): RecognitionSystemData? {
+        mutex.withLock {
+            var currentSystem: RecognitionSystemData? = null
 
-        val dataSets = ArrayList<ILineDataSet>()
-
-        if (currentSystem?.personData?.isNotEmpty() == true) {
-            currentSystem.personData.forEachIndexed { personInd, personData ->
-                val values = ArrayList<Entry>()
-
-                personData.probs.forEachIndexed { ind, prob ->
-                    values.add(Entry(personData.timestamps[ind].ms.toFloat(), prob))
-                }
-
-                val lineDataSet = LineDataSet(values, personData.personID)
-
-                lineDataSet.color = colors[personInd % colors.size]
-                lineDataSet.valueTextColor = colors[personInd % colors.size]
-                lineDataSet.setCircleColor(colors[personInd % colors.size])
-                dataSets.add(lineDataSet)
+            try {
+                currentSystem = model.systemList.value?.get(index)
+            } catch (e: Exception) {
+                e.printStackTrace()
+                return currentSystem
             }
 
-            val data = LineData(dataSets)
-            binding.graph.data = data
-            binding.graph.invalidate()
+            val dataSets = ArrayList<ILineDataSet>()
+
+            if (currentSystem?.personData?.isNotEmpty() == true) {
+                currentSystem.personData.forEachIndexed { personInd, personData ->
+                    val values = ArrayList<Entry>()
+
+                    personData.probs.forEachIndexed { ind, prob ->
+                        values.add(Entry(personData.timestamps[ind].ms.toFloat(), prob))
+                    }
+
+                    val lineDataSet = LineDataSet(values, personData.personID)
+
+                    lineDataSet.color = colors[personInd % colors.size]
+                    lineDataSet.valueTextColor = colors[personInd % colors.size]
+                    lineDataSet.setCircleColor(colors[personInd % colors.size])
+                    dataSets.add(lineDataSet)
+                }
+
+                val data = LineData(dataSets)
+                withContext(Dispatchers.Main) {
+                    binding.graph.data = data
+                    binding.graph.invalidate()
+                }
+            }
+            return currentSystem
         }
-        return currentSystem
     }
 
     override fun onDestroyView() {

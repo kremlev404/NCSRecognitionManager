@@ -13,10 +13,6 @@ class RecognitionSystemViewModel : ViewModel() {
         Navigation.selectedSystem
     }
 
-    val recognitionSystemData: MutableLiveData<ArrayList<RecognitionSystemData>> by lazy {
-        MutableLiveData<ArrayList<RecognitionSystemData>>()
-    }
-
     val currentUser: MutableLiveData<String> by lazy {
         NCSFirebase.currentUser
     }

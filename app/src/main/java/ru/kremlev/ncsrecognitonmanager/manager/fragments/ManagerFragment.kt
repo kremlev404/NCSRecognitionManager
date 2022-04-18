@@ -4,9 +4,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -15,7 +15,6 @@ import com.google.firebase.auth.FirebaseAuth
 
 import ru.kremlev.ncsrecognitonmanager.databinding.FragmentManagerBinding
 import ru.kremlev.ncsrecognitonmanager.manager.adapters.RecyclerViewManagerAdapter
-import ru.kremlev.ncsrecognitonmanager.manager.data.RecognitionSystemData
 import ru.kremlev.ncsrecognitonmanager.manager.model.Navigation
 import ru.kremlev.ncsrecognitonmanager.manager.viewmodels.RecognitionSystemViewModel
 import ru.kremlev.ncsrecognitonmanager.utils.LogManager
@@ -54,13 +53,7 @@ class ManagerFragment : Fragment() {
             recyclerSystemsIdListManager.addItemDecoration(dividerItemDecoration)
         }
 
-        model.recognitionSystemData.observe(viewLifecycleOwner, Observer<ArrayList<RecognitionSystemData>> { list ->
-            LogManager.d()
-            list.log()
-            adapter.setData(list)
-            Navigation.selectedSystem.value = -1
-        })
-
+        var lastSize = -1
         model.systemList.observe(viewLifecycleOwner) { list ->
             if (list.isEmpty())
                 binding.horizontalProgressbar.visibility = View.VISIBLE
@@ -69,7 +62,11 @@ class ManagerFragment : Fragment() {
             LogManager.d()
             list.log()
             adapter.setData(list)
-            Navigation.selectedSystem.value = -1
+            if (list.size < lastSize) {
+                Navigation.selectedSystem.value = -1
+                Toast.makeText(requireContext(), "Some Recognition System Removed, Please Select Available System", Toast.LENGTH_SHORT).show()
+                lastSize = list.size
+            }
         }
 
         return view

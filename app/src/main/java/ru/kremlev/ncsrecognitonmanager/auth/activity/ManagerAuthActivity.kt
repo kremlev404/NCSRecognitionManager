@@ -44,6 +44,7 @@ class ManagerAuthActivity : AppCompatActivity() {
             }
         }
     }
+
     private fun resetPass() {
         var dialogBinding: DialogResetPasswordBinding? = DialogResetPasswordBinding.inflate(layoutInflater)
 
