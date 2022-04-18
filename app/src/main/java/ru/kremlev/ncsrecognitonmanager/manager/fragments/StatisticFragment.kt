@@ -1,5 +1,6 @@
 package ru.kremlev.ncsrecognitonmanager.manager.fragments
 
+import android.annotation.SuppressLint
 import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -15,7 +16,9 @@ import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.formatter.ValueFormatter
+import com.github.mikephil.charting.highlight.Highlight
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
+import com.github.mikephil.charting.listener.OnChartValueSelectedListener
 import com.github.mikephil.charting.utils.ColorTemplate
 
 import java.text.SimpleDateFormat
@@ -26,7 +29,7 @@ import ru.kremlev.ncsrecognitonmanager.manager.data.RecognitionSystemData
 import ru.kremlev.ncsrecognitonmanager.manager.viewmodels.RecognitionSystemViewModel
 import ru.kremlev.ncsrecognitonmanager.utils.LogManager
 
-class StatisticFragment : Fragment() {
+class StatisticFragment : Fragment(), OnChartValueSelectedListener {
     private var _binding: FragmentStatisticBinding? = null
     private val binding: FragmentStatisticBinding
         get() = _binding!!
@@ -51,14 +54,27 @@ class StatisticFragment : Fragment() {
         return view
     }
 
+    @SuppressLint("SetTextI18n")
+    override fun onValueSelected(e: Entry?, h: Highlight?) {
+        val format: SimpleDateFormat = SimpleDateFormat("dd/MMM/yyyy hh:mm:ss", Locale.ENGLISH)
+        binding.tvSelectedItem.text = "Chosen Point: (${e?.y} : ${format.format(Date(e?.x?.toLong() ?: 0L))})"
+    }
+
+    @SuppressLint("SetTextI18n")
+    override fun onNothingSelected() {
+        binding.tvSelectedItem.text = "Please Select Point"
+    }
+
     private fun setupGraph() {
         binding.graph.xAxis.position = XAxis.XAxisPosition.BOTTOM
+
+        binding.graph.setOnChartValueSelectedListener(this)
 
         val xAxis: XAxis = binding.graph.xAxis
         xAxis.textColor = Color.WHITE
         xAxis.granularity = .25f
         xAxis.valueFormatter = object : ValueFormatter() {
-            private val mFormat: SimpleDateFormat = SimpleDateFormat("dd MMM HH:mm", Locale.ENGLISH)
+            private val mFormat: SimpleDateFormat = SimpleDateFormat("mm:ss", Locale.ENGLISH)
             override fun getFormattedValue(value: Float): String {
                 return mFormat.format(Date(value.toLong()))
             }

@@ -26,7 +26,6 @@
         <activity
             android:name=".manager.acitivity.ManagerActivity"
             android:exported="true"
-            android:screenOrientation="portrait"
             android:theme="@style/SplashTheme">
 
         </activity>

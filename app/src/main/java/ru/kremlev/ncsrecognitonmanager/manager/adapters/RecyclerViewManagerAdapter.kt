@@ -43,7 +43,7 @@ class RecyclerViewManagerAdapter(
         return ViewManagerHolder(binding)
     }
 
-    @SuppressLint("SetTextI18n", "UseCompatLoadingForDrawables", "NotifyDataSetChanged")
+    @SuppressLint("UseCompatLoadingForDrawables", "NotifyDataSetChanged")
     override fun onBindViewHolder(holder: ViewManagerHolder, @SuppressLint("RecyclerView") position: Int) {
         val current = itemList[position]
         if (position == selectedItem) {
