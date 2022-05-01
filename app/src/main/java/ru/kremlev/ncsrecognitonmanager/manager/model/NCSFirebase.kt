@@ -9,6 +9,8 @@ import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 
 import ru.kremlev.ncsrecognitonmanager.manager.data.PersonData
 import ru.kremlev.ncsrecognitonmanager.manager.data.RecognitionSystemData
@@ -18,6 +20,7 @@ import ru.kremlev.ncsrecognitonmanager.utils.LogManager
 
 object NCSFirebase {
     private lateinit var database: DatabaseReference
+    private val mutex = Mutex()
     private var systemIdLocalList: ArrayList<RecognitionSystemData> = arrayListOf()
 
     val currentUser: MutableLiveData<String> by lazy {
@@ -28,39 +31,40 @@ object NCSFirebase {
         MutableLiveData<ArrayList<RecognitionSystemData>>()
     }
 
+    private fun handleChanges(snapshot: DataSnapshot) {
+        CoroutineScope(Dispatchers.Default).launch {
+            mutex.withLock {
+                treeDive(snapshot)
+                updateData()
+            }
+        }
+    }
+
     fun init() {
         database = Firebase.database.reference
         FirebaseAuth.getInstance().addAuthStateListener {
-            currentUser.value = it.currentUser.toString().substringBeforeLast("@")
+            currentUser.value = it.currentUser?.email.toString().substringBeforeLast("@")
         }
         database
             .addChildEventListener(object : ChildEventListener {
                 override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
-                    CoroutineScope(Dispatchers.Default).launch {
-                        treeDive(snapshot)
-                        updateData()
-                    }
+                    LogManager.i()
+                    handleChanges(snapshot)
                 }
 
                 override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
-                    CoroutineScope(Dispatchers.Default).launch {
-                        treeDive(snapshot)
-                        updateData()
-                    }
+                    LogManager.i()
+                    handleChanges(snapshot)
                 }
 
                 override fun onChildRemoved(snapshot: DataSnapshot) {
-                    CoroutineScope(Dispatchers.Default).launch {
-                        treeDive(snapshot)
-                        updateData()
-                    }
+                    LogManager.i()
+                    handleChanges(snapshot)
                 }
 
                 override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {
-                    CoroutineScope(Dispatchers.Default).launch {
-                        treeDive(snapshot)
-                        updateData()
-                    }
+                    LogManager.i()
+                    handleChanges(snapshot)
                 }
 
                 override fun onCancelled(error: DatabaseError) {
@@ -81,7 +85,6 @@ object NCSFirebase {
         var probs = arrayListOf<Float>()
         val personsList = ArrayList<PersonData>()
         var ts = arrayListOf<TimeStamp>()
-        var i = 0
 
         //system
         rsId.children.forEach { personId ->
@@ -93,8 +96,8 @@ object NCSFirebase {
                     val listProb = it.value as ArrayList<Float>
                     probs = listProb
                 } else if (it.key?.contains("timestamp") == true) {
-                    val listProb = it.value as ArrayList<Long>
-                    listProb.forEach { lp ->
+                    val listTS = it.value as ArrayList<Long>
+                    listTS.forEach { lp ->
                         ts.add(TimeStamp(lp))
                     }
                 }
@@ -117,16 +120,39 @@ object NCSFirebase {
         }
     }
 
+    fun deletePoint(mId: String, rsId: String, pId: String, index: Int) {
+        LogManager.d("deletePoint $mId $rsId $pId $index")
+        val personNode = database.child(mId).child(rsId).child(pId)
+        val timestamp = personNode.child("timestamp")
+        timestamp.get().addOnSuccessListener { tsNode ->
+            val prob = database.child(mId).child(rsId).child(pId).child("prob")
+            val timestamps = tsNode.value as ArrayList<Long>
+            timestamps.removeAt(index)
+
+            prob.get().addOnSuccessListener {
+                val probs = it.value as ArrayList<Float>
+                probs.removeAt(index)
+
+                personNode.updateChildren(mapOf<String, ArrayList<Float>>(Pair(it.key!!, probs)))
+                personNode.updateChildren(mapOf<String, ArrayList<Long>>(Pair(tsNode.key!!, timestamps)))
+            }
+        }
+    }
+
     private fun treeDive(dataSnapshot: DataSnapshot) {
         if (dataSnapshot.hasChildren()) {
             val key = dataSnapshot.key.toString()
 
-            if (key.contains("mId:")) {
-                parseManagerId(key.substringAfter("mId:"))
-            } else if (key.contains("rsId:")) {
-                parseSystemId(dataSnapshot)
-            } else {
-                LogManager.d("${dataSnapshot.key.toString()}:  ${dataSnapshot.value} ")
+            when {
+                key.contains("mId:") -> {
+                    parseManagerId(key.substringAfter("mId:"))
+                }
+                key.contains("rsId:") -> {
+                    parseSystemId(dataSnapshot)
+                }
+                else -> {
+                    LogManager.d("${dataSnapshot.key.toString()}:  ${dataSnapshot.value} ")
+                }
             }
             dataSnapshot.children.forEach { treeDive(it) }
         }

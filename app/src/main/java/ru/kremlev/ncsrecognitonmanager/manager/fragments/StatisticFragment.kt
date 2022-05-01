@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 
@@ -20,10 +21,10 @@ import com.github.mikephil.charting.highlight.Highlight
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener
 import com.github.mikephil.charting.utils.ColorTemplate
-import java.lang.Exception
 
 import java.text.SimpleDateFormat
 import java.util.*
+
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -33,6 +34,7 @@ import kotlinx.coroutines.withContext
 
 import ru.kremlev.ncsrecognitonmanager.databinding.FragmentStatisticBinding
 import ru.kremlev.ncsrecognitonmanager.manager.data.RecognitionSystemData
+import ru.kremlev.ncsrecognitonmanager.manager.model.NCSFirebase
 import ru.kremlev.ncsrecognitonmanager.manager.viewmodels.RecognitionSystemViewModel
 import ru.kremlev.ncsrecognitonmanager.utils.LogManager
 
@@ -78,13 +80,37 @@ class StatisticFragment : Fragment(), OnChartValueSelectedListener {
 
     @SuppressLint("SetTextI18n")
     override fun onValueSelected(e: Entry?, h: Highlight?) {
-        val format: SimpleDateFormat = SimpleDateFormat("dd/MMM/yyyy hh:mm:ss::ms", Locale.ENGLISH)
+        val format: SimpleDateFormat = SimpleDateFormat("dd/MMM/yyyy hh:mm:ss:ms", Locale.ENGLISH)
         binding.tvSelectedItem.text = "Chosen Point: (${e?.y} : ${format.format(Date(e?.x?.toLong() ?: 0L))})"
+        val tsLong = e?.x?.toLong()
+
+        binding.tvDeleteItem.visibility = View.VISIBLE
+        binding.horizontalScale.visibility = View.VISIBLE
+
+        binding.tvDeleteItem.setOnClickListener {
+            val dataSetIndex = h?.dataSetIndex ?: return@setOnClickListener
+            val pId = binding.graph.data.getDataSetByIndex(dataSetIndex).label
+            val index = binding.graph.data.getDataSetByIndex(dataSetIndex).getEntryIndex(e)
+
+            val rsID = model.getSelectedSystem().value?.let { selected ->
+                val systemList = model.systemList.value
+                if (selected < systemList?.size!!)
+                    model.systemList.value?.get(selected)?.id
+                else
+                    null
+            }
+
+            if (rsID != null && pId != null && tsLong != null && index > -1) {
+                NCSFirebase.deletePoint("mId:${model.currentUser.value.toString()}", "rsId:${rsID}", "pId:${pId}", index)
+            }
+        }
     }
 
     @SuppressLint("SetTextI18n")
     override fun onNothingSelected() {
         binding.tvSelectedItem.text = "Please Select Point"
+        binding.tvDeleteItem.visibility = View.GONE
+        binding.horizontalScale.visibility = View.GONE
     }
 
     private fun setupGraph() {
@@ -96,7 +122,7 @@ class StatisticFragment : Fragment(), OnChartValueSelectedListener {
         xAxis.textColor = Color.WHITE
         xAxis.granularity = .25f
         xAxis.valueFormatter = object : ValueFormatter() {
-            private val mFormat: SimpleDateFormat = SimpleDateFormat("hh::mm:ss", Locale.ENGLISH)
+            private val mFormat: SimpleDateFormat = SimpleDateFormat("hh:mm:ss", Locale.ENGLISH)
             override fun getFormattedValue(value: Float): String {
                 return mFormat.format(Date(value.toLong()))
             }
