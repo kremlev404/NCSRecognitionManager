@@ -145,32 +145,17 @@ object NCSFirebase {
 
             when {
                 key.contains("mId:") -> {
-                    parseManagerId(key.substringAfter("mId:"))
+                    if (currentUser.value != key.substringAfter("mId:"))
+                        return
                 }
                 key.contains("rsId:") -> {
                     parseSystemId(dataSnapshot)
                 }
                 else -> {
-                    LogManager.d("${dataSnapshot.key.toString()}:  ${dataSnapshot.value} ")
+                    return
                 }
             }
             dataSnapshot.children.forEach { treeDive(it) }
         }
-    }
-
-    private fun parseManagerId(mId: String) {
-        LogManager.d("parseManagerId: $mId ")
-    }
-
-    private fun parsePersonId(pId: String) {
-        LogManager.d("parsePersonId: $pId ")
-    }
-
-    private fun parseProb(probs: ArrayList<String>?) {
-        LogManager.d("parseProb: ${probs?.javaClass} ")
-    }
-
-    private fun parseTimestamps(ts: ArrayList<String>?) {
-        LogManager.d("parseTimestamps: ${ts?.javaClass} ")
     }
 }
