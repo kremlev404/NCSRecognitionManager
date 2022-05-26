@@ -85,7 +85,6 @@ class StatisticFragment : Fragment(), OnChartValueSelectedListener {
         val tsLong = e?.x?.toLong()
 
         binding.tvDeleteItem.visibility = View.VISIBLE
-        binding.horizontalScale.visibility = View.VISIBLE
 
         binding.tvDeleteItem.setOnClickListener {
             val dataSetIndex = h?.dataSetIndex ?: return@setOnClickListener
@@ -110,7 +109,6 @@ class StatisticFragment : Fragment(), OnChartValueSelectedListener {
     override fun onNothingSelected() {
         binding.tvSelectedItem.text = "Please Select Point"
         binding.tvDeleteItem.visibility = View.GONE
-        binding.horizontalScale.visibility = View.GONE
     }
 
     private fun setupGraph() {
@@ -149,7 +147,14 @@ class StatisticFragment : Fragment(), OnChartValueSelectedListener {
     private val colors = intArrayOf(
         ColorTemplate.VORDIPLOM_COLORS[0],
         ColorTemplate.VORDIPLOM_COLORS[1],
-        ColorTemplate.VORDIPLOM_COLORS[2]
+        ColorTemplate.VORDIPLOM_COLORS[2],
+        ColorTemplate.VORDIPLOM_COLORS[3],
+        ColorTemplate.VORDIPLOM_COLORS[4],
+        ColorTemplate.COLORFUL_COLORS[0],
+        ColorTemplate.COLORFUL_COLORS[1],
+        ColorTemplate.COLORFUL_COLORS[2],
+        ColorTemplate.COLORFUL_COLORS[3],
+        ColorTemplate.COLORFUL_COLORS[4]
     )
 
     private suspend fun updateGraph(index: Int): RecognitionSystemData? {
