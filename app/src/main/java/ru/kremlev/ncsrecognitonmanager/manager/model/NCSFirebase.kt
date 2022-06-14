@@ -29,7 +29,7 @@ object NCSFirebase {
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    fun DatabaseReference.subscribe(): Flow<DataSnapshot> =
+    private fun DatabaseReference.subscribe(): Flow<DataSnapshot> =
         callbackFlow<DataSnapshot> {
             NCSFirebase.database
                 .addChildEventListener(object : ChildEventListener {
