@@ -13,5 +13,14 @@
     <string name="password">Password</string>
     <string name="email">Email</string>
     <string name="ncs_face_descriptor">NCS Face Descriptor</string>
+    <string name="select_point_to_view_data">Select point to view data</string>
+    <string name="delete_point">Delete Point</string>
+    <string name="system_id">system_id</string>
+    <string name="chosen_system">Chosen System:</string>
+    <string name="available_recognition_system_s">Available Recognition System\'s:</string>
+    <string name="manager_id">manager_id</string>
+    <string name="welecome_back">Welecome back:</string>
+    <string name="logout">Logout</string>
+    <string name="recognition_system_removed">Some Recognition System Removed, Please Select Available System</string>
 
 </resources>

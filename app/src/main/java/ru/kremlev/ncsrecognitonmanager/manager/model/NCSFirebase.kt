@@ -6,11 +6,9 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.*
 
 import ru.kremlev.ncsrecognitonmanager.manager.data.PersonData
 import ru.kremlev.ncsrecognitonmanager.manager.data.RecognitionSystemData
@@ -20,7 +18,6 @@ import ru.kremlev.ncsrecognitonmanager.utils.LogManager
 
 object NCSFirebase {
     private lateinit var database: DatabaseReference
-    private val mutex = Mutex()
     private var systemIdLocalList: ArrayList<RecognitionSystemData> = arrayListOf()
 
     val currentUser: MutableLiveData<String> by lazy {
@@ -31,46 +28,47 @@ object NCSFirebase {
         MutableLiveData<ArrayList<RecognitionSystemData>>()
     }
 
-    private fun handleChanges(snapshot: DataSnapshot) {
-        CoroutineScope(Dispatchers.Default).launch {
-            mutex.withLock {
-                treeDive(snapshot)
-                updateData()
-            }
-        }
-    }
+    @OptIn(ExperimentalCoroutinesApi::class)
+    fun DatabaseReference.subscribe(): Flow<DataSnapshot> =
+        callbackFlow<DataSnapshot> {
+            NCSFirebase.database
+                .addChildEventListener(object : ChildEventListener {
+                    override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
+                        LogManager.i()
+                        offer(snapshot)
+                    }
+                    override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
+                        LogManager.i()
+                        offer(snapshot)
+                    }
+                    override fun onChildRemoved(snapshot: DataSnapshot) {
+                        LogManager.i()
+                        offer(snapshot)
+                    }
+                    override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {
+                        LogManager.i()
+                        offer(snapshot)
+                    }
+                    override fun onCancelled(error: DatabaseError) {
+                        LogManager.e("", error.toException())
+                    }
+                })
+            awaitClose()
+        }.flowOn(Dispatchers.Default)
 
     fun init() {
         database = Firebase.database.reference
         FirebaseAuth.getInstance().addAuthStateListener {
             currentUser.value = it.currentUser?.email.toString().substringBeforeLast("@")
         }
-        database
-            .addChildEventListener(object : ChildEventListener {
-                override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
-                    LogManager.i()
-                    handleChanges(snapshot)
+        CoroutineScope(Dispatchers.Default).launch {
+            database
+                .subscribe()
+                .collect { snapshot ->
+                    treeDive(snapshot)
+                    updateData()
                 }
-
-                override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
-                    LogManager.i()
-                    handleChanges(snapshot)
-                }
-
-                override fun onChildRemoved(snapshot: DataSnapshot) {
-                    LogManager.i()
-                    handleChanges(snapshot)
-                }
-
-                override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {
-                    LogManager.i()
-                    handleChanges(snapshot)
-                }
-
-                override fun onCancelled(error: DatabaseError) {
-                    LogManager.e("", error.toException())
-                }
-            })
+        }
     }
 
     private fun updateData() {
@@ -134,7 +132,17 @@ object NCSFirebase {
                 probs.removeAt(index)
 
                 personNode.updateChildren(mapOf<String, ArrayList<Float>>(Pair(it.key!!, probs)))
-                personNode.updateChildren(mapOf<String, ArrayList<Long>>(Pair(tsNode.key!!, timestamps)))
+                personNode.updateChildren(
+                    mapOf<String, ArrayList<Long>>(
+                        Pair(
+                            tsNode.key!!,
+                            timestamps
+                        )
+                    )
+                )
+            }
+            .addOnFailureListener {
+                LogManager.d("Failed deletePoint $mId $rsId $pId $index")
             }
         }
     }

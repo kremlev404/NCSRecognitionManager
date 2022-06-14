@@ -8,7 +8,7 @@
         android:id="@+id/tv_welcome_back"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Welecome back: "
+        android:text="@string/welecome_back"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         app:layout_constraintStart_toStartOf="parent"
@@ -18,7 +18,7 @@
         android:id="@+id/tv_manager_login"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="manager_id"
+        android:text="@string/manager_id"
         app:layout_constraintStart_toEndOf="@id/tv_welcome_back"
         app:layout_constraintTop_toTopOf="@id/tv_welcome_back" />
     <TextView
@@ -27,7 +27,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
         android:textSize="18sp"
-        android:text="Available Recognition System's: "
+        android:text="@string/available_recognition_system_s"
         app:layout_constraintTop_toBottomOf="@id/tv_welcome_back"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

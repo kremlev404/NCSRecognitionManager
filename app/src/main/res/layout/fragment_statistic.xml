@@ -11,7 +11,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:layout_marginStart="16dp"
-        android:text="Chosen System: "
+        android:text="@string/chosen_system"
         android:textSize="18sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -20,7 +20,7 @@
         android:id="@+id/tv_id"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="system_id"
+        android:text="@string/system_id"
         android:textSize="18sp"
         app:layout_constraintStart_toEndOf="@id/tv_choosen"
         app:layout_constraintTop_toTopOf="@id/tv_choosen" />
@@ -40,7 +40,7 @@
         android:id="@+id/tv_selected_item"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Select point to view data "
+        android:text="@string/select_point_to_view_data"
         android:layout_marginTop="16dp"
         android:textSize="18sp"
         app:layout_constraintStart_toStartOf="@id/tv_choosen"
@@ -48,14 +48,16 @@
 
     <TextView
         android:id="@+id/tv_delete_item"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Delete Point"
-        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="42dp"
+        android:textAlignment="textEnd"
+        android:text="@string/delete_point"
+        android:visibility="visible"
         android:layout_marginTop="16dp"
         android:textColor="@color/red"
         android:textSize="18sp"
         android:layout_marginEnd="16dp"
+        android:layout_marginStart="16dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/graph" />
+        app:layout_constraintTop_toBottomOf="@id/tv_selected_item" />
 </androidx.constraintlayout.widget.ConstraintLayout>

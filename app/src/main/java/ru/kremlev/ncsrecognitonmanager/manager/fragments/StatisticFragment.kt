@@ -9,6 +9,7 @@ import android.view.ViewGroup
 
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.asFlow
 
 import com.github.mikephil.charting.components.Description
 import com.github.mikephil.charting.components.XAxis
@@ -27,9 +28,9 @@ import java.util.*
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 
 import ru.kremlev.ncsrecognitonmanager.databinding.FragmentStatisticBinding
@@ -47,14 +48,18 @@ class StatisticFragment : Fragment(), OnChartValueSelectedListener {
 
     private val model: RecognitionSystemViewModel by activityViewModels()
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
         _binding = FragmentStatisticBinding.inflate(inflater, container, false)
         val view = binding.root
 
         setupGraph()
 
-        model.getSelectedSystem().observe(viewLifecycleOwner) { it ->
-            CoroutineScope(Dispatchers.Default).launch {
+        CoroutineScope(Dispatchers.Default).launch {
+            model.getSelectedSystem().asFlow().collect { it ->
                 LogManager.d()
                 val selectedSystem = if (it > -1) {
                     (updateGraph(it)?.id ?: "No selected").toString()
@@ -65,10 +70,9 @@ class StatisticFragment : Fragment(), OnChartValueSelectedListener {
                 }
             }
         }
-
         model.systemList.observe(viewLifecycleOwner) {
-            model.getSelectedSystem().value?.let { selected ->
-                CoroutineScope(Dispatchers.Default).launch {
+            CoroutineScope(Dispatchers.Default).launch {
+                model.getSelectedSystem().asFlow().collect { selected ->
                     if (selected > -1)
                         updateGraph(selected)
                 }
@@ -81,7 +85,8 @@ class StatisticFragment : Fragment(), OnChartValueSelectedListener {
     @SuppressLint("SetTextI18n")
     override fun onValueSelected(e: Entry?, h: Highlight?) {
         val format: SimpleDateFormat = SimpleDateFormat("dd/MMM/yyyy hh:mm:ss:ms", Locale.ENGLISH)
-        binding.tvSelectedItem.text = "Chosen Point: (${e?.y} : ${format.format(Date(e?.x?.toLong() ?: 0L))})"
+        binding.tvSelectedItem.text =
+            "Chosen Point: (${e?.y} : ${format.format(Date(e?.x?.toLong() ?: 0L))})"
         val tsLong = e?.x?.toLong()
 
         binding.tvDeleteItem.visibility = View.VISIBLE
@@ -100,7 +105,12 @@ class StatisticFragment : Fragment(), OnChartValueSelectedListener {
             }
 
             if (rsID != null && pId != null && tsLong != null && index > -1) {
-                NCSFirebase.deletePoint("mId:${model.currentUser.value.toString()}", "rsId:${rsID}", "pId:${pId}", index)
+                NCSFirebase.deletePoint(
+                    "mId:${model.currentUser.value.toString()}",
+                    "rsId:${rsID}",
+                    "pId:${pId}",
+                    index
+                )
             }
         }
     }
@@ -158,42 +168,42 @@ class StatisticFragment : Fragment(), OnChartValueSelectedListener {
     )
 
     private suspend fun updateGraph(index: Int): RecognitionSystemData? {
-        mutex.withLock {
-            var currentSystem: RecognitionSystemData? = null
+        //mutex.withLock {
+        var currentSystem: RecognitionSystemData? = null
 
-            try {
-                currentSystem = model.systemList.value?.get(index)
-            } catch (e: Exception) {
-                e.printStackTrace()
-                return currentSystem
-            }
-
-            val dataSets = ArrayList<ILineDataSet>()
-
-            if (currentSystem?.personData?.isNotEmpty() == true) {
-                currentSystem.personData.forEachIndexed { personInd, personData ->
-                    val values = ArrayList<Entry>()
-
-                    personData.probs.forEachIndexed { ind, prob ->
-                        values.add(Entry(personData.timestamps[ind].ms.toFloat(), prob))
-                    }
-
-                    val lineDataSet = LineDataSet(values, personData.personID)
-
-                    lineDataSet.color = colors[personInd % colors.size]
-                    lineDataSet.valueTextColor = colors[personInd % colors.size]
-                    lineDataSet.setCircleColor(colors[personInd % colors.size])
-                    dataSets.add(lineDataSet)
-                }
-
-                val data = LineData(dataSets)
-                withContext(Dispatchers.Main) {
-                    binding.graph.data = data
-                    binding.graph.invalidate()
-                }
-            }
+        try {
+            currentSystem = model.systemList.value?.get(index)
+        } catch (e: Exception) {
+            e.printStackTrace()
             return currentSystem
         }
+
+        val dataSets = ArrayList<ILineDataSet>()
+
+        if (currentSystem?.personData?.isNotEmpty() == true) {
+            currentSystem.personData.forEachIndexed { personInd, personData ->
+                val values = ArrayList<Entry>()
+
+                personData.probs.forEachIndexed { ind, prob ->
+                    values.add(Entry(personData.timestamps[ind].ms.toFloat(), prob))
+                }
+
+                val lineDataSet = LineDataSet(values, personData.personID)
+
+                lineDataSet.color = colors[personInd % colors.size]
+                lineDataSet.valueTextColor = colors[personInd % colors.size]
+                lineDataSet.setCircleColor(colors[personInd % colors.size])
+                dataSets.add(lineDataSet)
+            }
+
+            val data = LineData(dataSets)
+            withContext(Dispatchers.Main) {
+                binding.graph.data = data
+                binding.graph.invalidate()
+            }
+        }
+        return currentSystem
+        //}
     }
 
     override fun onDestroyView() {

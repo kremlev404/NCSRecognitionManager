@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
 import com.google.firebase.auth.FirebaseAuth
+import ru.kremlev.ncsrecognitonmanager.R
 
 import ru.kremlev.ncsrecognitonmanager.databinding.FragmentManagerBinding
 import ru.kremlev.ncsrecognitonmanager.manager.adapters.RecyclerViewManagerAdapter
@@ -29,11 +30,16 @@ class ManagerFragment : Fragment() {
 
     private var layoutManager: RecyclerView.LayoutManager? = null
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
         _binding = FragmentManagerBinding.inflate(inflater, container, false)
         val view = binding.root
         try {
-            binding.tvManagerLogin.text = FirebaseAuth.getInstance().currentUser!!.email?.substringBeforeLast("@")
+            binding.tvManagerLogin.text =
+                FirebaseAuth.getInstance().currentUser!!.email?.substringBeforeLast("@")
         } catch (e: Exception) {
             LogManager.e("", e)
         }
@@ -64,7 +70,11 @@ class ManagerFragment : Fragment() {
             adapter.setData(list)
             if (list.size < lastSize) {
                 Navigation.selectedSystem.value = -1
-                Toast.makeText(requireContext(), "Some Recognition System Removed, Please Select Available System", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    requireContext(),
+                    getString(R.string.recognition_system_removed),
+                    Toast.LENGTH_SHORT
+                ).show()
                 lastSize = list.size
             }
         }

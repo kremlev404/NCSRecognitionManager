@@ -117,14 +117,14 @@
             android:backgroundTintMode="src_atop">
 
             <TextView
-                android:id="@+id/forget_btn_tv"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:autoSizeTextType="uniform"
-                android:gravity="end"
-                android:text="@string/reset_password"
-                android:textAlignment="gravity"
-                android:textColor="@color/red">
+                    android:id="@+id/forget_btn_tv"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:autoSizeTextType="uniform"
+                    android:gravity="end"
+                    android:text="@string/reset_password"
+                    android:textAlignment="gravity"
+                    android:textColor="@color/red">
 
             </TextView>
 
